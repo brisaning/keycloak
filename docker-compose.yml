@@ -18,7 +18,8 @@ services:
       - "8080:8080"
       - "8443:8443"
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     networks:
       - keycloak_network
   postgresql:
@@ -34,6 +35,12 @@ services:
       - "5432:5432"
     networks:
       - keycloak_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRESQL_USERNAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgresql_data:
